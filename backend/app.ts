@@ -4,13 +4,20 @@ import cors from "cors";
 import { config } from "dotenv";
 
 
-// ✅ Load environment variables from root .env
+//  Load environment variables from root .env
 config();
 
 export const app: Application = express();
 
 // Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

@@ -6,8 +6,10 @@ import { Payment } from "../models/paymentModel";
 export const checkout = async (req: Request, res: Response): Promise<void> => {
   try {
     const { amount } = req.body;
+    console.log("Received amount:", amount);
 
     if (!amount || isNaN(amount)) {
+      console.log("Invalid amount received");
       res.status(400).json({ success: false, message: "Invalid amount" });
       return;
     }
@@ -16,18 +18,18 @@ export const checkout = async (req: Request, res: Response): Promise<void> => {
       amount: Math.round(Number(amount) * 100), // Convert to paisa
       currency: "INR",
     };
+    console.log("Creating Razorpay order with options:", options);
 
     const order = await instance.orders.create(options);
+    console.log("Razorpay order created:", order);
 
-    res.status(200).json({
-      success: true,
-      order,
-    });
+    res.status(200).json({ success: true, order });
   } catch (error) {
     console.error("Checkout error:", error);
     res.status(500).json({ success: false, message: "Failed to create order" });
   }
 };
+
 
 export const paymentVerification = async (req: Request, res: Response): Promise<void> => {
   try {
