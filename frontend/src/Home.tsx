@@ -16,12 +16,31 @@ interface RazorpayOrder {
 }
 
 const Home: React.FC = () => {
+  // Function to dynamically load Razorpay script
+  const loadRazorpayScript = (): Promise<boolean> => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   const checkoutHandler = async (amount: number) => {
+    const isScriptLoaded = await loadRazorpayScript();
+    if (!isScriptLoaded) {
+      alert("Razorpay SDK failed to load. Are you online?");
+      return;
+    }
+
     try {
+      // Get Razorpay key from backend
       const { data: keyData } = await axios.get<{ key: string }>(
         "http://localhost:2507/api/getkey"
       );
 
+      // Create order on backend
       const { data: orderData } = await axios.post<{ order: RazorpayOrder }>(
         "http://localhost:2507/api/checkout",
         { amount }
